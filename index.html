@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Game Hub</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI','Sarabun',sans-serif; background:linear-gradient(135deg,#667eea,#764ba2);
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .card { background:#fff; border-radius:24px; padding:32px; width:100%; max-width:560px; box-shadow:0 20px 60px rgba(0,0,0,.3); }
+  h1 { text-align:center; color:#4a3f8f; font-size:27px; margin-bottom:6px; }
+  .sub { text-align:center; color:#888; font-size:14px; margin-bottom:22px; }
+  .menu-item { display:flex; align-items:center; gap:16px; width:100%; padding:19px; margin-bottom:13px;
+    border:2px solid #e8e6f5; background:#fbfaff; border-radius:18px; cursor:pointer; text-align:left; transition:.22s; font-family:inherit; }
+  .menu-item:hover { border-color:#764ba2; background:#f3efff; transform:translateY(-3px); box-shadow:0 8px 20px rgba(118,75,162,.18); }
+  .mi-icon { font-size:36px; flex-shrink:0; }
+  .mi-title { font-size:18px; font-weight:700; color:#2d2a4a; margin-bottom:3px; }
+  .mi-desc { font-size:13.5px; color:#7c7c94; line-height:1.5; }
+  .cefr { font-size:12px; background:#764ba2; color:#fff; padding:2px 9px; border-radius:20px; font-weight:600; vertical-align:middle; }
+  .best { display:inline-block; margin-top:6px; font-size:12px; background:#ede8ff; color:#764ba2; padding:3px 9px; border-radius:20px; font-weight:600; }
+  .back { border:none; background:none; color:#8a83b8; font-size:14.5px; cursor:pointer; margin-bottom:12px; font-family:inherit; font-weight:600; padding:4px; }
+  .back:hover { color:#764ba2; }
+  .bar { height:10px; background:#eee; border-radius:10px; overflow:hidden; margin-bottom:16px; }
+  .fill { height:100%; background:linear-gradient(90deg,#667eea,#764ba2); width:0%; transition:.4s; }
+  .info { display:flex; justify-content:space-between; font-size:14px; color:#666; margin-bottom:8px; font-weight:600; }
+  .lvbadge { text-align:center; margin-bottom:12px; }
+  .lvbadge span { font-size:12px; background:#f0ecff; color:#6b4fa0; padding:4px 12px; border-radius:20px; font-weight:600; }
+  .wordrow { display:flex; align-items:center; justify-content:center; gap:12px; margin:14px 0 4px; }
+  .word { font-size:40px; font-weight:700; color:#2d2a4a; text-align:center; }
+  .speak { border:none; background:#f0ecff; color:#764ba2; width:48px; height:48px; border-radius:50%; font-size:22px;
+    cursor:pointer; transition:.2s; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .speak:hover { background:#764ba2; color:#fff; transform:scale(1.1); }
+  .speak.talking { animation:pulse .7s infinite; background:#764ba2; color:#fff; }
+  @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.18);} }
+  .phon { text-align:center; color:#9a8fc4; font-size:15px; margin-bottom:8px; letter-spacing:.5px; }
+  .hintrow { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px; }
+  .hint { color:#999; font-size:15px; font-style:italic; text-align:center; }
+  .minispk { border:none; background:#f4f4fa; color:#888; width:28px; height:28px; border-radius:50%; font-size:13px; cursor:pointer; flex-shrink:0; }
+  .minispk:hover { background:#764ba2; color:#fff; }
+  .opt { display:block; width:100%; padding:14px; margin-bottom:9px; border:2px solid #e4e4ef; background:#fafaff;
+    border-radius:14px; font-size:16.5px; cursor:pointer; text-align:left; transition:.2s; font-family:inherit; }
+  .opt:hover:not(:disabled) { border-color:#764ba2; background:#f3efff; transform:translateX(4px); }
+  .opt:disabled { cursor:default; }
+  .correct { background:#d4f8d4 !important; border-color:#37b24d !important; color:#1a7431; font-weight:600; }
+  .wrong { background:#ffe0e0 !important; border-color:#e03131 !important; color:#a61e1e; }
+  .msg { text-align:center; font-weight:600; min-height:24px; margin:10px 0; font-size:16px; }
+  .btn { width:100%; padding:15px; border:none; border-radius:14px; font-size:17px;
+    background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; cursor:pointer; font-weight:600; font-family:inherit; }
+  .btn:hover { opacity:.9; }
+  .btn.ghost { background:#f0eefa; color:#764ba2; margin-top:10px; }
+  .toggle { display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px; color:#777; margin-top:14px; }
+  .toggle input { width:17px; height:17px; accent-color:#764ba2; cursor:pointer; }
+  .hide { display:none; }
+  .sentence { font-size:21px; line-height:1.85; text-align:center; color:#2d2a4a; background:#f7f5ff; padding:20px 16px; border-radius:16px; margin-bottom:8px; }
+  .blank { display:inline-block; min-width:86px; border-bottom:3px solid #764ba2; color:#764ba2; font-weight:700; }
+  .base { text-align:center; color:#8a83b8; font-size:14.5px; margin-bottom:4px; }
+  .tagrow { display:flex; justify-content:center; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .tag { background:#ede8ff; color:#6b4fa0; font-size:12.5px; padding:4px 11px; border-radius:20px; font-weight:600; }
+  .explain { background:#fff9e6; border-left:4px solid #f5c542; color:#7a6420; padding:12px 14px; border-radius:10px; font-size:14.5px; line-height:1.6; margin:10px 0; }
+  .sentspk { display:flex; justify-content:center; margin-bottom:12px; }
+  .final { text-align:center; }
+  .score-big { font-size:62px; font-weight:700; color:#764ba2; margin:8px 0; }
+  .grade { font-size:21px; color:#555; margin-bottom:6px; }
+  .review { text-align:left; max-height:210px; overflow-y:auto; margin:16px 0; font-size:14px; }
+  .review div { padding:9px 8px; border-bottom:1px solid #eee; color:#666; display:flex; align-items:center; gap:8px; }
+  .review b { color:#2d2a4a; }
+  .warn { background:#fff4e0; color:#a06b00; font-size:13px; padding:10px; border-radius:10px; text-align:center; margin-top:12px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <!-- ===== หน้าหลัก ===== -->
+  <div id="home">
+    <h1>🎮 English Game Hub</h1>
+    <p class="sub">คลังคำศัพท์และไวยากรณ์ • 3 ระดับความยาก</p>
+    <button class="menu-item" onclick="openGame('vocab')">
+      <span class="mi-icon">📖</span>
+      <span>
+        <div class="mi-title">Vocab Quiz — ทายคำศัพท์</div>
+        <div class="mi-desc">ดูคำศัพท์อังกฤษแล้วเลือกความหมายไทย มีเสียงอ่าน คำอ่าน IPA และประโยคตัวอย่าง</div>
+        <span class="best" id="bestVocab"></span>
+      </span>
+    </button>
+    <button class="menu-item" onclick="openGame('gram')">
+      <span class="mi-icon">✏️</span>
+      <span>
+        <div class="mi-title">Grammar Fill — เติมคำให้ถูกแกรมมาร์</div>
+        <div class="mi-desc">เติมคำในช่องว่างให้ถูกหลักไวยากรณ์ พร้อมคำอธิบายภาษาไทยทุกข้อ</div>
+        <span class="best" id="bestGram"></span>
+      </span>
+    </button>
+    <label class="toggle"><input type="checkbox" id="auto" checked> อ่านออกเสียงอัตโนมัติ</label>
+    <div id="nospeech" class="warn hide">⚠️ เบราว์เซอร์นี้ไม่รองรับเสียงอ่าน ลองใช้ Chrome หรือ Edge</div>
+  </div>
+
+  <!-- ===== เลือกระดับความยาก ===== -->
+  <div id="level" class="hide">
+    <button class="back" onclick="goHome()">← กลับหน้าหลัก</button>
+    <h1 id="lvTitle"></h1>
+    <p class="sub">เลือกระดับความยาก</p>
+    <div id="lvList"></div>
+  </div>
+
+  <!-- ===== เกม 1: คำศัพท์ ===== -->
+  <div id="vocabGame" class="hide">
+    <button class="back" onclick="backToLevel()">← เปลี่ยนระดับ</button>
+    <div class="bar"><div class="fill" id="vFill"></div></div>
+    <div class="info"><span id="vNum">ข้อ 1/10</span><span id="vStreak">🔥 0</span><span id="vScore">คะแนน: 0</span></div>
+    <div class="lvbadge"><span id="vLv"></span></div>
+    <div class="wordrow"><span class="word" id="vWord">—</span><button class="speak" id="vSpk" title="ฟังเสียงอ่าน">🔊</button></div>
+    <div class="phon" id="vPhon"></div>
+    <div class="hintrow"><span class="hint" id="vHint"></span><button class="minispk" id="vSpkSent" title="ฟังประโยค">🔉</button></div>
+    <div id="vOpts"></div>
+    <div class="msg" id="vMsg"></div>
+    <button class="btn hide" id="vNext" onclick="vocabNext()">ข้อถัดไป →</button>
+  </div>
+
+  <!-- ===== เกม 2: แกรมมาร์ ===== -->
+  <div id="gramGame" class="hide">
+    <button class="back" onclick="backToLevel()">← เปลี่ยนระดับ</button>
+    <div class="bar"><div class="fill" id="gFill"></div></div>
+    <div class="info"><span id="gNum">ข้อ 1/10</span><span id="gStreak">🔥 0</span><span id="gScore">คะแนน: 0</span></div>
+    <div class="lvbadge"><span id="gLv"></span></div>
+    <div class="tagrow"><span class="tag" id="gTag">—</span></div>
+    <div class="sentence" id="gSent">—</div>
+    <div class="base" id="gBase"></div>
+    <div class="sentspk"><button class="minispk" id="gSpk" title="ฟังประโยคเต็ม">🔊</button></div>
+    <div id="gOpts"></div>
+    <div class="msg" id="gMsg"></div>
+    <div class="explain hide" id="gExp"></div>
+    <button class="btn hide" id="gNext" onclick="gramNext()">ข้อถัดไป →</button>
+  </div>
+
+  <!-- ===== สรุปผล ===== -->
+  <div id="end" class="hide final">
+    <h1 id="endTitle">จบเกม!</h1>
+    <div class="score-big" id="finalScore">0</div>
+    <div class="grade" id="grade"></div>
+    <div class="review" id="review"></div>
+    <button class="btn" id="replay">เล่นระดับนี้อีกครั้ง</button>
+    <button class="btn ghost" onclick="backToLevel()">เปลี่ยนระดับ</button>
+    <button class="btn ghost" onclick="goHome()">กลับหน้าหลัก</button>
+  </div>
+</div>
+
+<!-- โหลดไฟล์คำศัพท์จากภายนอก -->
+<script src="words.js"></script>
+
+<script>
+/* ============ จัดการคลังคำศัพท์ (ดึงจาก words.js) ============ */
+const VOCAB = window.WORDPACK || { 
+  // หากไม่มีไฟล์ words.js จะใช้ข้อมูลจำลองนี้ป้องกันแอปพัง
+  easy: [
+    { w: "Error", p: "คำเตือน", h: "เกิดข้อผิดพลาดในการโหลดคลังคำศัพท์ กรุณาตรวจสอบไฟล์ words.js", a: "ข้อผิดพลาด" },
+    { w: "Data", p: "-", h: "-", a: "ข้อมูล" },{ w: "Load", p: "-", h: "-", a: "โหลด" },{ w: "File", p: "-", h: "-", a: "ไฟล์" }
+  ],
+  medium: [{w: "Missing Data", p:"", h:"", a:"ไม่มีข้อมูล"},{w:"A",p:"",h:"",a:"A"},{w:"B",p:"",h:"",a:"B"},{w:"C",p:"",h:"",a:"C"}],
+  hard: [{w: "Missing Data", p:"", h:"", a:"ไม่มีข้อมูล"},{w:"A",p:"",h:"",a:"A"},{w:"B",p:"",h:"",a:"B"},{w:"C",p:"",h:"",a:"C"}]
+};
+
+/* ============ คลังแกรมมาร์แยกระดับ ============ */
+const GRAM = {
+easy:[
+{s:"She ___ a teacher at a local school.",base:"be",a:"is",o:["are","am","be"],t:"Verb to be",e:"ประธาน she เป็นเอกพจน์บุรุษที่ 3 ใน Present Simple ใช้ is"},
+{s:"They ___ to school every day.",base:"go",a:"go",o:["goes","going","went"],t:"Present Simple",e:"ประธานพหูพจน์ they ใช้กริยารูปเดิม ไม่ต้องเติม -s"},
+{s:"I ___ an apple right now.",base:"eat",a:"am eating",o:["eat","eats","ate"],t:"Present Continuous",e:"right now บอกว่ากำลังทำอยู่ขณะนี้ ใช้ am/is/are + V-ing"},
+{s:"He ___ TV last night.",base:"watch",a:"watched",o:["watch","watches","watching"],t:"Past Simple",e:"last night เป็นอดีตที่จบแล้ว จึงใช้กริยาช่อง 2"},
+{s:"There ___ a book on the table.",base:"be",a:"is",o:["are","were","am"],t:"There is / There are",e:"a book เป็นเอกพจน์ จึงใช้ There is"},
+{s:"I have two ___ at home.",base:"cat",a:"cats",o:["cat","cates","catss"],t:"Plural Noun",e:"two มากกว่าหนึ่ง นามนับได้ต้องเติม -s เป็นพหูพจน์"},
+{s:"This is ___ umbrella.",base:"a / an",a:"an",o:["a","the","some"],t:"Article",e:"umbrella ขึ้นต้นด้วยเสียงสระ จึงใช้ an ไม่ใช่ a"},
+{s:"She ___ swim very well.",base:"can",a:"can",o:["cans","can to","canning"],t:"Modal Can",e:"can ตามด้วยกริยาช่อง 1 ทันที ไม่เติม -s และไม่มี to"},
+{s:"The cat is ___ the box.",base:"—",a:"in",o:["on of","at in","to"],t:"Preposition of Place",e:"in ใช้กับการอยู่ข้างในพื้นที่ปิด ส่วน on ใช้กับการวางบนพื้นผิว"},
+{s:"___ is your name?",base:"—",a:"What",o:["Who","Where","When"],t:"Wh-Question",e:"ถามชื่อหรือข้อมูลของสิ่งใดสิ่งหนึ่ง ใช้ What"},
+{s:"This is ___ book, not yours.",base:"I",a:"my",o:["me","I","mine book"],t:"Possessive Adjective",e:"ขยายคำนามที่ตามมาต้องใช้ my ส่วน mine ใช้เดี่ยวๆ โดยไม่มีคำนามตาม"},
+{s:"He doesn't ___ coffee.",base:"like",a:"like",o:["likes","liked","liking"],t:"Negative Present",e:"หลัง doesn't ใช้กริยารูปเดิมเสมอ เพราะ does รับหน้าที่ผันไปแล้ว"},
+{s:"We ___ very happy yesterday.",base:"be",a:"were",o:["was","are","is"],t:"Past of Be",e:"ประธาน we เป็นพหูพจน์ในอดีต จึงใช้ were"},
+{s:"My sister is ___ than me.",base:"tall",a:"taller",o:["tallest","more tall","tall"],t:"Comparative",e:"คำคุณศัพท์พยางค์เดียวทำขั้นกว่าโดยเติม -er และตามด้วย than"},
+{s:"___ the door, please.",base:"open",a:"Open",o:["Opens","Opening","To open"],t:"Imperative",e:"ประโยคคำสั่งหรือขอร้องขึ้นต้นด้วยกริยาช่อง 1 โดยไม่มีประธาน"},
+{s:"I go to school ___ Monday.",base:"—",a:"on",o:["in","at","of"],t:"Preposition of Time",e:"on ใช้กับวันในสัปดาห์ ส่วน in ใช้กับเดือนหรือปี และ at ใช้กับเวลานาฬิกา"}
+],
+medium:[
+{s:"I ___ TV when the phone rang.",base:"watch",a:"was watching",o:["watch","watched","am watching"],t:"Past Continuous",e:"เหตุการณ์กำลังดำเนินอยู่ในอดีตแล้วมีอีกเหตุการณ์แทรก ใช้ was/were + V-ing"},
+{s:"They ___ here since 2015.",base:"live",a:"have lived",o:["live","lived","are living"],t:"Present Perfect",e:"since + จุดเวลา บอกว่าเริ่มในอดีตและยังดำเนินถึงปัจจุบัน ใช้ have/has + V3"},
+{s:"If it ___ tomorrow, we will stay home.",base:"rain",a:"rains",o:["will rain","rained","raining"],t:"Conditional Type 1",e:"เงื่อนไขที่ 1 ใช้ Present Simple ใน if-clause ห้ามใช้ will หลัง if"},
+{s:"This book is ___ than that one.",base:"interesting",a:"more interesting",o:["interestinger","most interesting","interesting"],t:"Comparative",e:"คำคุณศัพท์ยาวตั้งแต่ 3 พยางค์ใช้ more + adjective และตามด้วย than"},
+{s:"He enjoys ___ football on weekends.",base:"play",a:"playing",o:["to play","play","played"],t:"Gerund",e:"กริยา enjoy, avoid, finish, mind ต้องตามด้วย V-ing เสมอ"},
+{s:"The letter ___ by my sister yesterday.",base:"write",a:"was written",o:["wrote","is written","has written"],t:"Passive Voice",e:"ประธานเป็นผู้ถูกกระทำ และ yesterday เป็นอดีต จึงใช้ was/were + V3"},
+{s:"There ___ many people at the party.",base:"be",a:"were",o:["was","is","been"],t:"There is / There are",e:"many people เป็นพหูพจน์และเป็นเหตุการณ์ในอดีต จึงใช้ were"},
+{s:"You ___ wear a helmet when riding a bike.",base:"—",a:"should",o:["should to","shoulds","shoulding"],t:"Modal Verb",e:"Modal verb ตามด้วยกริยาช่อง 1 ทันที ไม่ต้องมี to และไม่เติม -s"},
+{s:"She is the woman ___ helped me.",base:"—",a:"who",o:["which","whose","whom"],t:"Relative Clause",e:"ขยายคนและทำหน้าที่เป็นประธานของกริยา helped จึงใช้ who"},
+{s:"I have ___ money left in my wallet.",base:"—",a:"little",o:["few","a few","many"],t:"Quantifier",e:"money เป็นนามนับไม่ได้ ใช้ little แปลว่ามีน้อยมาก ส่วน few ใช้กับนามนับได้"},
+{s:"By the time we arrived, the movie ___.",base:"start",a:"had started",o:["started","has started","was starting"],t:"Past Perfect",e:"เหตุการณ์ที่เกิดก่อนอีกเหตุการณ์หนึ่งในอดีต ใช้ had + V3"},
+{s:"He speaks English ___ than his brother.",base:"fluently",a:"more fluently",o:["fluentlier","most fluently","fluent"],t:"Adverb Comparison",e:"กริยาวิเศษณ์ที่ลงท้ายด้วย -ly ทำขั้นกว่าด้วย more + adverb"},
+{s:"Neither of the answers ___ correct.",base:"be",a:"is",o:["are","were","be"],t:"Subject-Verb Agreement",e:"Neither of + นามพหูพจน์ ถือเป็นเอกพจน์ กริยาจึงใช้รูปเอกพจน์"},
+{s:"I am looking forward to ___ from you.",base:"hear",a:"hearing",o:["hear","heard","to hear"],t:"Preposition + Gerund",e:"to ในวลี look forward to เป็นบุพบท ไม่ใช่ to infinitive จึงตามด้วย V-ing"},
+{s:"She has been working here ___ three years.",base:"—",a:"for",o:["since","during","from"],t:"For / Since",e:"for ใช้กับช่วงระยะเวลา ส่วน since ใช้กับจุดเริ่มต้นของเวลา"},
+{s:"If I ___ you, I would accept the offer.",base:"be",a:"were",o:["am","was","will be"],t:"Conditional Type 2",e:"เงื่อนไขที่ไม่เป็นจริงในปัจจุบัน ใช้ were กับทุกประธานรวมถึง I"},
+{s:"He promised ___ me later this evening.",base:"call",a:"to call",o:["calling","call","called"],t:"Infinitive",e:"กริยา promise, decide, agree, hope ต้องตามด้วย to + V1"},
+{s:"The man ___ car was stolen called the police.",base:"—",a:"whose",o:["who","which","that"],t:"Relative Pronoun",e:"whose ใช้แสดงความเป็นเจ้าของ เชื่อมคนกับสิ่งที่เขาเป็นเจ้าของ"}
+],
+hard:[
+{s:"Never ___ such a beautiful sight.",base:"see",a:"have I seen",o:["I have seen","did I saw","I saw"],t:"Inversion",e:"ขึ้นต้นประโยคด้วยคำปฏิเสธอย่าง Never ต้องสลับกริยาช่วยมาไว้หน้าประธาน"},
+{s:"The manager insisted that he ___ present at the meeting.",base:"be",a:"be",o:["is","was","will be"],t:"Subjunctive",e:"หลัง insist, demand, suggest ที่แสดงการเรียกร้อง ใช้กริยารูป base form กับทุกประธาน"},
+{s:"If I had studied harder, I ___ a doctor now.",base:"be",a:"would be",o:["would have been","will be","was"],t:"Mixed Conditional",e:"เงื่อนไขอยู่ในอดีตแต่ผลลัพธ์อยู่ปัจจุบัน (now) จึงใช้ would + V1"},
+{s:"___ in 1889, the tower still attracts millions.",base:"build",a:"Built",o:["Building","To build","Build"],t:"Participle Clause",e:"ประธานเป็นผู้ถูกกระทำ จึงใช้ past participle ขึ้นต้นวลีแบบลดรูป"},
+{s:"It was his attitude ___ annoyed everyone.",base:"—",a:"that",o:["what","which it","who"],t:"Cleft Sentence",e:"โครงสร้าง It was ... that ... ใช้เน้นส่วนสำคัญของประโยค"},
+{s:"Hardly ___ the room when the lights went out.",base:"enter",a:"had he entered",o:["he had entered","did he enter","he entered"],t:"Inversion with Hardly",e:"Hardly ขึ้นต้นประโยคต้องผัน had มาหน้าประธาน และคู่กับ when"},
+{s:"Not only ___ late, but he also forgot the documents.",base:"be",a:"was he",o:["he was","he is","was him"],t:"Inversion with Not only",e:"Not only ขึ้นต้นประโยคต้องสลับกริยาช่วยมาไว้ก่อนประธาน"},
+{s:"I would rather you ___ tell anyone about this.",base:"—",a:"didn't",o:["don't","won't","haven't"],t:"Would rather",e:"would rather + ประธาน + กริยาช่อง 2 ใช้บอกความต้องการที่อ้างถึงปัจจุบัน"},
+{s:"She must ___ the train; she is not here yet.",base:"miss",a:"have missed",o:["miss","missed","be missing"],t:"Modal Perfect",e:"must have + V3 ใช้คาดเดาเหตุการณ์ในอดีตอย่างมั่นใจ"},
+{s:"No sooner had we left ___ it started to rain.",base:"—",a:"than",o:["when","then","that"],t:"No sooner ... than",e:"No sooner ต้องคู่กับ than เสมอ ส่วน Hardly และ Scarcely คู่กับ when"},
+{s:"___ for your help, I would have failed.",base:"—",a:"Had it not been",o:["If it was not","Has it not been","Were it not been"],t:"Inverted Conditional 3",e:"ละ if ในเงื่อนไขที่ 3 โดยยก had ขึ้นต้นประโยคแทน"},
+{s:"The data ___ that the theory is flawed.",base:"suggest",a:"suggest",o:["suggests","is suggesting","has suggest"],t:"Formal Agreement",e:"data เป็นรูปพหูพจน์ของ datum ในภาษาทางการจึงใช้กริยารูปพหูพจน์"},
+{s:"He is said ___ in Paris for ten years.",base:"live",a:"to have lived",o:["to live","living","to be lived"],t:"Passive Reporting",e:"เหตุการณ์เกิดก่อนกริยาหลัก จึงใช้ to have + V3"},
+{s:"Such ___ the demand that tickets sold out in minutes.",base:"be",a:"was",o:["is","were","has been"],t:"Such ... that Inversion",e:"Such ขึ้นต้นประโยคต้องตามด้วยกริยา be ก่อนประธาน และ demand เป็นเอกพจน์ในอดีต"},
+{s:"Were it not for his support, the project ___.",base:"collapse",a:"would collapse",o:["will collapse","collapsed","would have collapsed"],t:"Inverted Conditional 2",e:"Were it not for เท่ากับ If it were not for เป็นเงื่อนไขที่ 2 ผลลัพธ์ใช้ would + V1"},
+{s:"It is high time we ___ this problem seriously.",base:"take",a:"took",o:["take","have taken","will take"],t:"It is high time",e:"It is high time ตามด้วยกริยาช่อง 2 แม้ความหมายจะอ้างถึงปัจจุบัน"}
+]
+};
+
+/* ============ ตั้งค่าระดับ ============ */
+const LEVELS = {
+  easy:  {name:"ง่าย",  cefr:"A1–A2", icon:"🟢", vdesc:"คำศัพท์พื้นฐานในชีวิตประจำวัน", gdesc:"Tense พื้นฐาน, Articles, Prepositions"},
+  medium:{name:"กลาง", cefr:"B1–B2", icon:"🟡", vdesc:"คำศัพท์ระดับสื่อสารและการทำงาน",  gdesc:"Perfect, Passive, Conditionals, Relative Clause"},
+  hard:  {name:"ยาก",  cefr:"C1–C2", icon:"🔴", vdesc:"คำศัพท์ระดับสูงสำหรับวิชาการและสอบ", gdesc:"Inversion, Subjunctive, Mixed Conditional"}
+};
+
+/* ============ ตัวช่วย ============ */
+const $ = id => document.getElementById(id);
+const shuffle = a => a.sort(()=>Math.random()-.5);
+const SCREENS = ['home','level','vocabGame','gramGame','end'];
+function show(id){ SCREENS.forEach(s=>$(s).classList.add('hide')); $(id).classList.remove('hide'); }
+
+/* ============ เสียงอ่าน ============ */
+let voice=null;
+const canSpeak = 'speechSynthesis' in window;
+function pickVoice(){
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v=>/en-(US|GB)/i.test(v.lang) && /google|natural|samantha|aria/i.test(v.name))
+       || vs.find(v=>/^en/i.test(v.lang)) || null;
+}
+if(canSpeak){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+else { window.addEventListener('load',()=>$('nospeech').classList.remove('hide')); }
+function speak(text, rate, btn){
+  if(!canSpeak) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=rate||0.85; u.pitch=1;
+  if(voice) u.voice=voice;
+  if(btn){ btn.classList.add('talking'); u.onend=u.onerror=()=>btn.classList.remove('talking'); }
+  speechSynthesis.speak(u);
+}
+const autoOn = ()=> $('auto').checked;
+
+/* ============ สถิติ ============ */
+const best = { vocab:{easy:0,medium:0,hard:0}, gram:{easy:0,medium:0,hard:0} };
+function bestOf(g){ return Math.max(best[g].easy,best[g].medium,best[g].hard); }
+function paintHome(){
+  // ใช้ค่าความยาวจริงของอาร์เรย์ที่โหลดมา
+  const vocabCount = (VOCAB.easy.length + VOCAB.medium.length + VOCAB.hard.length) || 0;
+  const gramCount = (GRAM.easy.length + GRAM.medium.length + GRAM.hard.length) || 0;
+  
+  $('bestVocab').textContent = bestOf('vocab') ? `🏅 คะแนนสูงสุด: ${bestOf('vocab')}` : `คลัง ${vocabCount} คำ • 3 ระดับ`;
+  $('bestGram').textContent  = bestOf('gram')  ? `🏅 คะแนนสูงสุด: ${bestOf('gram')}`  : `คลัง ${gramCount} ข้อ • 3 ระดับ`;
+}
+paintHome();
+
+/* ============ นำทาง ============ */
+let curGame='vocab', curLevel='easy';
+function goHome(){ if(canSpeak) speechSynthesis.cancel(); paintHome(); show('home'); }
+function backToLevel(){ openGame(curGame); }
+function openGame(g){
+  if(canSpeak) speechSynthesis.cancel();
+  curGame=g;
+  $('lvTitle').textContent = g==='vocab' ? '📖 Vocab Quiz' : '✏️ Grammar Fill';
+  const box=$('lvList'); box.innerHTML='';
+  ['easy','medium','hard'].forEach(lv=>{
+    const L=LEVELS[lv];
+    const pool = g==='vocab' ? VOCAB[lv] : GRAM[lv];
+    const b=document.createElement('button');
+    b.className='menu-item';
+    b.innerHTML = `<span class="mi-icon">${L.icon}</span><span>
+      <div class="mi-title">${L.name} <span class="cefr">${L.cefr}</span></div>
+      <div class="mi-desc">${g==='vocab'?L.vdesc:L.gdesc}<br>คลังทั้งหมด ${pool.length} ข้อ • สุ่มมาเล่น ${Math.min(10, pool.length)} ข้อ</div>
+      <span class="best">${best[g][lv] ? '🏅 คะแนนสูงสุด: '+best[g][lv] : 'ยังไม่เคยเล่นระดับนี้'}</span></span>`;
+    b.onclick = ()=> launch(g,lv);
+    box.appendChild(b);
+  });
+  show('level');
+}
+function launch(g,lv){
+  curLevel=lv;
+  if(g==='vocab') startVocab(); else startGram();
+}
+function lvLabel(){ const L=LEVELS[curLevel]; return `${L.icon} ระดับ${L.name} (${L.cefr})`; }
+
+/* ============ เกม 1: Vocab Quiz ============ */
+let vQs=[], vIdx=0, vScore=0, vStreak=0, vLog=[], totalVQs=0;
+function buildVocab(lv){
+  const pool = VOCAB[lv];
+  if(!pool || pool.length === 0) return [];
+  // สุ่มคำศัพท์และเลือกมาไม่เกิน 10 ข้อ
+  const selected = shuffle([...pool]).slice(0, 10);
+  return selected.map(q=>{
+    // ดึงช้อยส์หลอกจากใน pool ระดับเดียวกัน (กรองเอาตัวเฉลยออก)
+    let wrongs = pool.filter(x => x.a !== q.a);
+    wrongs = shuffle(wrongs).slice(0, 3).map(x => x.a);
+    // ถ้าคำศัพท์ในคลังมีไม่ถึง 4 คำ (หาช้อยส์หลอกไม่ได้) ให้เติมช้อยส์หลอกคงที่
+    while(wrongs.length < 3) {
+        wrongs.push("ตัวเลือกเพิ่มเติม " + (wrongs.length + 1));
+    }
+    return {w:q.w, p:q.p, h:q.h, a:q.a, o:wrongs};
+  });
+}
+function startVocab(){
+  vQs = buildVocab(curLevel);
+  if(vQs.length === 0) return alert("ไม่พบข้อมูลคำศัพท์ในระดับนี้");
+  totalVQs = vQs.length;
+  vIdx=0; vScore=0; vStreak=0; vLog=[];
+  $('vScore').textContent='คะแนน: 0'; $('vStreak').textContent='🔥 0';
+  $('vLv').textContent = lvLabel();
+  show('vocabGame'); vocabShow();
+}
+function vocabShow(){
+  const q=vQs[vIdx];
+  $('vNum').textContent=`ข้อ ${vIdx+1}/${totalVQs}`;
+  $('vFill').style.width=(vIdx/totalVQs*100)+'%';
+  $('vWord').textContent=q.w; $('vPhon').textContent=q.p;
+  $('vHint').textContent='"'+q.h+'"';
+  $('vMsg').textContent=''; $('vNext').classList.add('hide');$('vOpts').innerHTML='';
+  shuffle([q.a,...q.o]).forEach(c=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.textContent=c;
+    b.onclick=()=>vocabAnswer(b,c,q);
+    $('vOpts').appendChild(b);
+  });
+  if(autoOn()) setTimeout(()=>speak(q.w,0.8,$('vSpk')),350);
+}
+function vocabAnswer(btn,choice,q){
+  document.querySelectorAll('#vOpts .opt').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===q.a) b.classList.add('correct');
+  });
+  if(choice===q.a){
+    vStreak++;
+    const bonus = vStreak>=3?5:0;
+    vScore += 10+bonus;
+    $('vMsg').style.color='#37b24d';
+    $('vMsg').textContent = bonus?`✅ ถูกต้อง! +${10+bonus} (โบนัสต่อเนื่อง)`:'✅ ถูกต้อง! +10';
+    vLog.push({ok:true, main:q.w, sub:q.a, say:q.w});
+  } else {
+    vStreak=0; btn.classList.add('wrong');
+    $('vMsg').style.color='#e03131';
+    $('vMsg').textContent=`❌ ผิด! คำตอบคือ "${q.a}"`;
+    vLog.push({ok:false, main:q.w, sub:q.a, say:q.w});
+    if(autoOn()) setTimeout(()=>speak(q.w,0.7,$('vSpk')),200);   }$('vScore').textContent='คะแนน: '+vScore;
+  $('vStreak').textContent='🔥 '+vStreak;
+  $('vNext').classList.remove('hide');$('vNext').textContent = (vIdx===totalVQs-1) ? 'ดูผลคะแนน →':'ข้อถัดไป →';
+}
+function vocabNext(){
+  if(canSpeak) speechSynthesis.cancel();
+  vIdx++;
+  if(vIdx>=vQs.length) return finish('📖 Vocab Quiz', vScore, vLog, 'vocab', startVocab, totalVQs);
+  vocabShow();
+}
+$('vSpk').onclick     = ()=> speak(vQs[vIdx].w, 0.8,$('vSpk'));
+$('vSpkSent').onclick = ()=> speak(vQs[vIdx].h, 0.9,$('vSpkSent'));
+
+/* ============ เกม 2: Grammar Fill ============ */
+let gQs=[], gIdx=0, gScore=0, gStreak=0, gLog=[], totalGQs=0;
+function startGram(){
+  const pool = GRAM[curLevel];
+  gQs = shuffle([...pool]).slice(0,10);
+  totalGQs = gQs.length;
+  gIdx=0; gScore=0; gStreak=0; gLog=[];
+  $('gScore').textContent='คะแนน: 0'; $('gStreak').textContent='🔥 0';
+  $('gLv').textContent = lvLabel();
+  show('gramGame'); gramShow();
+}
+function gramShow(){
+  const q=gQs[gIdx];
+  $('gNum').textContent=`ข้อ ${gIdx+1}/${totalGQs}`;
+  $('gFill').style.width=(gIdx/totalGQs*100)+'\%';$('gTag').textContent=q.t;
+  $('gSent').innerHTML = q.s.replace('___','<span class="blank" id="blank">______</span>');
+  $('gBase').textContent = q.base==='—' ? '' : `คำตั้งต้น: ( ${q.base} )`;
+  $('gMsg').textContent='';$('gExp').classList.add('hide');
+  $('gNext').classList.add('hide');$('gOpts').innerHTML='';
+  shuffle([q.a,...q.o]).forEach(c=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.textContent=c;
+    b.onclick=()=>gramAnswer(b,c,q);
+    $('gOpts').appendChild(b);
+  });
+}
+function gramAnswer(btn,choice,q){
+  document.querySelectorAll('#gOpts .opt').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===q.a) b.classList.add('correct');
+  });
+  const full = q.s.replace('___', q.a);
+  $('blank').textContent = q.a;
+  $('blank').style.color = choice===q.a ? '#1a7431' : '#e03131';
+  if(choice===q.a){
+    gStreak++;
+    const bonus = gStreak>=3?5:0;
+    gScore += 10+bonus;
+    $('gMsg').style.color='#37b24d';
+    $('gMsg').textContent = bonus?`✅ ถูกต้อง! +${10+bonus} (โบนัสต่อเนื่อง)`:'✅ ถูกต้อง! +10';
+    gLog.push({ok:true, main:q.a, sub:q.t, say:full});
+  } else {
+    gStreak=0; btn.classList.add('wrong');
+    $('gMsg').style.color='#e03131';
+    $('gMsg').textContent=`❌ ผิด! คำตอบคือ "${q.a}"`;
+    gLog.push({ok:false, main:q.a, sub:q.t, say:full});
+  }
+  $('gExp').innerHTML = `💡 <b>${q.t}</b> — ${q.e}`;
+  $('gExp').classList.remove('hide');$('gScore').textContent='คะแนน: '+gScore;
+  $('gStreak').textContent='🔥 '+gStreak;
+  $('gNext').classList.remove('hide');$('gNext').textContent = (gIdx===totalGQs-1) ? 'ดูผลคะแนน →':'ข้อถัดไป →';
+  if(autoOn()) setTimeout(()=>speak(full,0.85,$('gSpk')),400);
+}
+function gramNext(){
+  if(canSpeak) speechSynthesis.cancel();
+  gIdx++;
+  if(gIdx>=gQs.length) return finish('✏️ Grammar Fill', gScore, gLog, 'gram', startGram, totalGQs);
+  gramShow();
+}
+$('gSpk').onclick = ()=> speak(gQs[gIdx].s.replace('___', gQs[gIdx].a), 0.85,$('gSpk'));
+
+/* ============ สรุปผล ============ */
+function finish(title, score, log, key, replayFn, totalItems){
+  if(canSpeak) speechSynthesis.cancel();
+  if(score > best[key][curLevel]) best[key][curLevel] = score;
+  const L=LEVELS[curLevel];
+  $('endTitle').textContent = `${title} — ${L.name} (${L.cefr})`;
+  $('finalScore').textContent = score;
+  
+  // คำนวณเปอร์เซ็นต์จากคะแนนเต็ม (ข้อละ 10 คะแนน ไม่รวมโบนัส)
+  const maxBaseScore = totalItems * 10;
+  const pct = score / maxBaseScore;
+  
+  $('grade').textContent = pct>=0.9 ? "🏆 เก่งมาก! ลองเลื่อนไประดับที่ยากขึ้น"
+                         : pct>=0.7 ? "🌟 ดีมาก! ใกล้เก่งแล้ว"
+                         : pct>=0.5 ? "👍 พอใช้ ฝึกระดับนี้ต่ออีกหน่อย"
+                                    : "📚 ต้องทบทวนอีกหน่อย ลองเล่นซ้ำดูนะ";
+  $('review').innerHTML='';
+  log.forEach(l=>{
+    const d=document.createElement('div');
+    d.innerHTML = `${l.ok?'✅':'❌'} <b>${l.main}</b> — ${l.sub}`;
+    const b=document.createElement('button');
+    b.className='minispk'; b.textContent='🔊';
+    b.onclick=()=>speak(l.say,0.85,b);
+    d.appendChild(b);
+    $('review').appendChild(d);
+  });
+  $('replay').onclick = replayFn;
+  show('end');
+}
+</script>
+</body>
+</html>
