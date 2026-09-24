@@ -300,8 +300,8 @@ let vQs=[], vIdx=0, vScore=0, vStreak=0, vLog=[], totalVQs=0;
 function buildVocab(lv){
   const pool = VOCAB[lv];
   if(!pool || pool.length === 0) return [];
-  // สุ่มคำศัพท์และเลือกมาไม่เกิน 10 ข้อ
-  const selected = shuffle([...pool]).slice(0, 10);
+  // สุ่มคำศัพท์และเลือกมาไม่เกิน 30 ข้อ
+  const selected = shuffle([...pool]).slice(0, 30);
   return selected.map(q=>{
     // ดึงช้อยส์หลอกจากใน pool ระดับเดียวกัน (กรองเอาตัวเฉลยออก)
     let wrongs = pool.filter(x => x.a !== q.a);
